@@ -1,0 +1,1 @@
+2.json中模拟接口请求数据，exam_score.proto为实例proto; run.sh调整-c 和 -n满足不同压测需求。 

@@ -1,0 +1,90 @@
+syntax = "proto3";
+package pbs;
+
+service ExamScoreService {
+    rpc GenerateScore(GenerateScoreReq) returns (Result); //生成考核成绩
+}
+
+message GenerateScoreReq {
+    string exam_id = 1; //考试id
+    repeated string cutter_ids = 2; //刀具id
+    string blank_id = 3; //毛坯id
+    double nc_run_time = 5; //NC运行时间
+    int64 install_cutter_num = 6; //装刀次数
+    int64 change_blank_num = 7; //更换毛坯次数
+    int64 hit_cutter_num = 8; //撞刀次数
+    map<string,string> nc_program = 9; //NC程序
+    repeated Clamp clamps = 10; //装夹位置
+    repeated MachineCraft crafts = 11; //工艺列表
+    repeated Workpiece workpieces = 12; //工件列表(车床)
+    repeated ModelImageByte model_image = 13; //工件模型图片
+    repeated WorkpieceMilling workpiece_milling = 14; //工件列表(铣床)
+    string scoreStandard_id = 24; //考核标准id
+    bool is_single_step = 25; //是否为单步骤提交，true为单步骤提交，false为最终提交
+}
+
+// 装夹位置
+message Clamp {
+    int32 clamp_type = 1; //装夹位置 车床:0左侧 1右侧 铣床:2直接装夹 3平口钳装夹
+    double clamp_position = 2; //装夹距离
+    double clamp_position_other = 3;  //装夹距离2
+}
+
+// 工件(车床)
+message Workpiece {
+    int32 piece_type = 1; //工件类型 车床:0距离 1直径 2螺纹 3倒角 4角度 5粗糙度 6圆角 7形位公差 铣床:8距离 9圆弧
+    double param = 2; //工件参数(公称尺寸、半径、中径、角度、粗糙度、形位公差)
+    int32 index = 3; //工件质量序号
+}
+
+message ModelImageByte {
+    int32 model_type = 1; //0透视图 1正视图 2侧视图 3顶视图
+    bytes file = 2;
+}
+
+// 工件(铣床)
+message WorkpieceMilling {
+    int32 piece_type = 1; //工件类型 车床:0距离 1直径 2螺纹 3倒角 4角度 5粗糙度 6圆角 7形位公差 铣床:8距离 9圆弧
+    double param = 6; //提交参数
+    int32 index = 7; //工件质量序号
+}
+
+// 工艺
+message MachineCraft {
+    int32 craft_type = 1; //工艺类型 0粗_左端外轮廓 1精_左端外轮廓 2粗_左端内轮廓 3精_左端内轮廓 4粗_右端外轮廓 5精_右端外轮廓 6粗_右端内轮廓 7精_右端内轮廓 8切槽 9螺纹 10左端端面 11右端端面 12切断
+    double spindle_speed = 2; //主轴转速(r/min)
+    double feed_speed = 3; //进给速度(mm/r)
+    double back_cutter_mete = 4; //背吃刀量(mm)
+    Cutter cutter = 5;  //刀具
+}
+
+message Result {
+	int32 code = 1; //-1未登录 0失败 1成功
+	string msg = 2; //错误信息
+}
+
+// 刀具
+message Cutter {
+    string id = 1;
+    string cutter_name = 2 ; //刀具名称
+    int32 cutter_type = 3; //刀具类型 0外圆车刀 1内车刀 2割刀 3螺纹刀
+    int32 cutter_source = 4; //类型 0车床刀具 1铣床刀具
+    string cutter_img = 5; //刀具/刀片图片
+    string declination_img = 6; //主偏角图片
+    int32 cutter_point_material = 7; //刀尖材料 0硬质合金 1高速钢 2钨钢
+    string cutter_remark = 8 ; //备注
+    int32 cutter_sn = 9; //刀具编号
+    repeated CutterAttr cutter_attr = 10 ; //刀具动态属性
+    int64 created_at = 11; //创建时间
+    int64 updated_at = 12; //更新时间
+    int64 deleted_at = 13; //删除时间
+    string cutterModifier = 14; // 刀具最近修改人
+    string cutterCreator = 15 ; // 刀具创建者
+}
+
+// 刀具动态属性
+message CutterAttr {
+    string attr_id = 1;
+    string name = 2;
+    string value = 3;
+}

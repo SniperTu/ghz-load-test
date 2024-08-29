@@ -1,0 +1,1 @@
+ghz -c 500 -n 10000 --insecure --proto exam_score.proto --call pbs.ExamScoreService.GenerateScore -D 2.json -o report.html -O html 127.0.0.1:8100
